@@ -22,7 +22,7 @@ object MinesweeperApp
             CalculatedLandmineField.calculate(landmineField))
           )
 
-        output = calculatedLandmineFields
+        outputString = calculatedLandmineFields
           .map(CalculatedLandmineField.getString)
           .foldLeft((1, "")) {
             case ((index, output), minefield) => (
@@ -37,7 +37,7 @@ object MinesweeperApp
             )
           }
       }
-      yield output._2
+      yield outputString._2
 
     results.fold(
       System.err.println,
