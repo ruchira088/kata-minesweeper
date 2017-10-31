@@ -1,41 +1,19 @@
 package app
 
-case class LandmineField(columnCount: Int, rowCount: Int, rows: List[List[Cell]])
+case class LandmineField(columnCount: Int, rowCount: Int, grid: Map[(Int, Int), String])
 
 object LandmineField
 {
-  def parseRows(rows: List[String], rowCount: Int = 0): List[List[Cell]] = rows match
+  def parseRows(rows: List[String], rowCount: Int = 0): Map[(Int, Int), String] = rows match
     {
       case x :: xs => {
-        val (_, cellList) = x.trim.split("").foldLeft((0, List.empty[Cell])) {
-          case ((column, cells), value) => (column + 1, Cell(rowCount, column, value) :: cells)
+        val (_, row) = x.trim.split("").foldLeft((0, Map.empty[(Int, Int), String])) {
+          case ((column, grid), value) => (column + 1, grid + ((column, rowCount) -> value))
         }
 
-        cellList :: parseRows(xs, rowCount + 1)
+        row ++ parseRows(xs, rowCount + 1)
       }
 
-      case Nil => List.empty
+      case Nil => Map.empty
     }
-
-  def getCell(landmineField: LandmineField)(coordinate: Coordinate): Option[Cell] =
-    landmineField.rows.flatten.find(_.coordinate == coordinate)
-
-  def calculate(landmineField: LandmineField): List[List[CalculatedCell]] =
-    landmineField.rows.map {
-      row => for {
-        cell: Cell <- row
-
-        adjacentCoordinates = Coordinate.getAdjacentCoordinates(
-          cell.coordinate, landmineField.rowCount, landmineField.columnCount
-        )
-
-        getCellFromLandmineField = (getCell _)(landmineField)
-
-        value: Int = adjacentCoordinates
-          .map(coordinate => getCellFromLandmineField(coordinate).fold(0)(cell => if (cell.hasLandmine) 1 else 0))
-          .sum
-      }
-        yield CalculatedCell(cell, value)
-
-  }
 }

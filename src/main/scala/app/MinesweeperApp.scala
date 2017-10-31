@@ -14,9 +14,16 @@ object MinesweeperApp
       {
         fileContents <- FileUtils.readFile(INPUT_FILE_PATH)
         landmineFields <- FileParser(fileContents)
+
         calculatedLandmineFields = landmineFields
-          .map(LandmineField.calculate)
-          .map(rows => CalculatedLandmineField.getString(CalculatedLandmineField(rows)))
+          .map(landmineField => CalculatedLandmineField(
+            landmineField.rowCount,
+            landmineField.columnCount,
+            CalculatedLandmineField.calculate(landmineField))
+          )
+
+        output = calculatedLandmineFields
+          .map(CalculatedLandmineField.getString)
           .foldLeft((1, "")) {
             case ((index, output), minefield) => (
               index + 1,
@@ -24,12 +31,13 @@ object MinesweeperApp
                 output
               else
                 s"""$output
-                  |Field #$index:$minefield
+                  |Field #$index:
+                  |$minefield
                   |""".stripMargin
             )
           }
       }
-      yield calculatedLandmineFields._2
+      yield output._2
 
     results.fold(
       System.err.println,

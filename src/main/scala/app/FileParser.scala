@@ -22,7 +22,7 @@ object FileParser
 
       rest <- FileParser(fileContent.tail.drop(rowCount))
 
-      landmineField = LandmineField(rowCount, columnCount, LandmineField.parseRows(fileContent.tail.take(rowCount)))
+      landmineField = LandmineField(columnCount, rowCount, LandmineField.parseRows(fileContent.tail.take(rowCount)))
     }
       yield landmineField :: rest
   }
